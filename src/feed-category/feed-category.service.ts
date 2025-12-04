@@ -4,6 +4,7 @@ import { UpdateFeedCategoryDto } from './dto/update-feed-category.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {FeedCategory} from './entities/feed-category.entity'
+import { PaginationService } from 'src/pagination/pagination_service';
 
 @Injectable()
 export class FeedCategoryService {
@@ -18,6 +19,19 @@ export class FeedCategoryService {
 
   async findAll(): Promise<FeedCategory[]> {
     return this.categoryRepo.find({ relations: ['products'] });
+  }
+    async findAllPaginated(
+    page: number,
+    limit: number,
+    search?: string,
+    sort?: string,
+  ) {
+    return PaginationService.paginate(this.categoryRepo, page, limit, {
+      search,
+      searchFields: ['name'], // searchable fields
+      sort,
+      relations: ['products'],
+    });
   }
    async findOne(id: number): Promise<FeedCategory> {
     const category = await this.categoryRepo.findOne({

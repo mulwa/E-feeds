@@ -6,6 +6,7 @@ import { FeedCategory } from '../feed-category/entities/feed-category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { FeedProduct } from './entities/feed-product.entity';
+import { PaginationService } from 'src/pagination/pagination_service';
 
 @Injectable()
 export class FeedProductService {
@@ -52,6 +53,19 @@ export class FeedProductService {
       relations: ['company', 'category'],
     });
   }
+   async findAllPaginated(
+      page: number,
+      limit: number,
+      search?: string,
+      sort?: string,
+    ) {
+      return PaginationService.paginate(this.productRepo, page, limit, {
+        search,
+        searchFields: ['productName'], // searchable fields
+        sort,
+        relations: ['company','category'],
+      });
+    }
 
   async findOne(id: number): Promise<FeedProduct> {
     const product = await this.productRepo.findOne({

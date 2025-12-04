@@ -4,6 +4,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Company } from './entities/company.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationService } from 'src/pagination/pagination_service';
 
 @Injectable()
 export class CompanyService {
@@ -18,6 +19,19 @@ export class CompanyService {
   async findAll(): Promise<Company[]> {
     return this.companyRepo.find({ relations: ['products'] });
   }
+   async findAllPaginated(
+      page: number,
+      limit: number,
+      search?: string,
+      sort?: string,
+    ) {
+      return PaginationService.paginate(this.companyRepo, page, limit, {
+        search,
+        searchFields: ['name'], // searchable fields
+        sort,
+        // relations: ['products'],
+      });
+    }
   async findOne(id: number): Promise<Company> {
     const company = await this.companyRepo.findOne({
       where: { companyId: id },
