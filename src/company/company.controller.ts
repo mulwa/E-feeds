@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBadRequestResponse } from '@nestjs/swagger';
 import { PaginationQueryDto } from 'src/pagination/pagination.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('Company')
 @Controller('company')
@@ -16,12 +17,11 @@ export class CompanyController {
     return this.companyService.create(createCompanyDto);
   }
 
-  // @Get()
-  // findAll() {
-  //   return this.companyService.findAll();
-  // }
+  @UseGuards(JwtAuthGuard)
   @Get()
-    async findAll(@Query() query: PaginationQueryDto) {
+    async findAll(@Req() req, @Query() query: PaginationQueryDto) {
+      console.log('Authorization header:', req.headers.authorization);
+      console.log(req.user);
       const page = query.page ?? 1;
       const limit = query.limit ?? 10;
       return this.companyService.findAllPaginated(

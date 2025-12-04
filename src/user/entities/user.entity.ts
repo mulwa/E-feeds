@@ -1,11 +1,12 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Order } from '../../order/entities/order.entity';
 import { RoyaltyPoint } from 'src/royalty-point/entities/royalty-point.entity';
-// import { RoyaltyPoint } from '../../royalty/entities/royalty-point.entity';
+
 
 export enum UserRole {
   FARMER = 'farmer',
   DEALER = 'dealer',
+  ADMIN = 'admin'
 }
 
 @Entity()

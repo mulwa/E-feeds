@@ -2,6 +2,8 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'ty
 import { OrderItem } from './order-item.entity';
 import { User } from 'src/user/entities/user.entity';
 import { RoyaltyPoint } from 'src/royalty-point/entities/royalty-point.entity';
+import { PaymentStatus } from '../enum/payment-status';
+import { OrderStatus } from '../enum/order-status';
 
 
 @Entity()
@@ -22,6 +24,20 @@ export class Order {
 
   @OneToMany(() => RoyaltyPoint, (rp) => rp.order, { nullable: true })
   royaltyPoints: RoyaltyPoint[];
+
+   @Column({
+    type: 'enum',
+    enum: OrderStatus,
+    default: OrderStatus.PENDING,
+  })
+  status: OrderStatus;
+
+  @Column({
+    type: 'enum',
+    enum: PaymentStatus,
+    default: PaymentStatus.PENDING,
+  })
+  paymentStatus: PaymentStatus
 
   @Column({
     type: 'timestamp',

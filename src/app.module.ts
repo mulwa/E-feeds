@@ -9,6 +9,7 @@ import { ConfigModule,ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { OrdersModule } from './order/orders.module';
 import { RoyaltyPointModule } from './royalty-point/royalty-point.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [CompanyModule,
@@ -32,6 +33,7 @@ import { RoyaltyPointModule } from './royalty-point/royalty-point.module';
     UserModule,
     OrdersModule,
     RoyaltyPointModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
