@@ -6,6 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { FeedCategoryModule } from './feed-category/feed-category.module';
 import { FeedProductModule } from './feed-product/feed-product.module';
 import { ConfigModule,ConfigService } from '@nestjs/config';
+import { UserModule } from './user/user.module';
+import { OrdersModule } from './order/orders.module';
+import { RoyaltyPointModule } from './royalty-point/royalty-point.module';
 
 @Module({
   imports: [CompanyModule,
@@ -26,6 +29,9 @@ import { ConfigModule,ConfigService } from '@nestjs/config';
     }),
     FeedCategoryModule,
     FeedProductModule,
+    UserModule,
+    OrdersModule,
+    RoyaltyPointModule,
   ],
   controllers: [AppController],
   providers: [AppService],
