@@ -1,26 +1,50 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRoyaltyPointDto } from './dto/create-royalty-point.dto';
-import { UpdateRoyaltyPointDto } from './dto/update-royalty-point.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RoyaltyPoint } from './entities/royalty-point.entity';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class RoyaltyPointService {
-  create(createRoyaltyPointDto: CreateRoyaltyPointDto) {
-    return 'This action adds a new royaltyPoint';
+  constructor(
+    @InjectRepository(RoyaltyPoint)
+    private royaltyRepo: Repository<RoyaltyPoint>,
+
+    @InjectRepository(User)
+    private userRepo: Repository<User>,
+  ) {}
+
+  async findMyRoyalties(userId: number) {
+    return this.royaltyRepo.find({
+      where: { user: { userId } },
+      relations: ['order'],
+      order: { createdAt: 'DESC' },
+    });
   }
 
-  findAll() {
-    return `This action returns all royaltyPoint`;
+  async getUserTotal(userId: number) {
+    const user = await this.userRepo.findOne({
+      where: { userId },
+      relations: ['royaltyPoints'],
+    });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const total = user.royaltyPoints.reduce(
+      (sum, r) => sum + r.pointsEarned,
+      0,
+    );
+
+    return {
+      userId,
+      totalPoints: total,
+    };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} royaltyPoint`;
-  }
-
-  update(id: number, updateRoyaltyPointDto: UpdateRoyaltyPointDto) {
-    return `This action updates a #${id} royaltyPoint`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} royaltyPoint`;
+  async findAll() {
+    return this.royaltyRepo.find({
+      relations: ['user', 'order'],
+      order: { createdAt: 'DESC' },
+    });
   }
 }

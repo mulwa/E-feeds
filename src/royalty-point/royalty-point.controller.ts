@@ -1,34 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Param } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+} from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RoyaltyPointService } from './royalty-point.service';
-import { CreateRoyaltyPointDto } from './dto/create-royalty-point.dto';
-import { UpdateRoyaltyPointDto } from './dto/update-royalty-point.dto';
 
-@Controller('royalty-point')
+@ApiTags('Royalty Points')
+@ApiBearerAuth()
+@Controller('royalty')
 export class RoyaltyPointController {
-  constructor(private readonly royaltyPointService: RoyaltyPointService) {}
+  constructor(private readonly royaltyService: RoyaltyPointService) {}
 
-  @Post()
-  create(@Body() createRoyaltyPointDto: CreateRoyaltyPointDto) {
-    return this.royaltyPointService.create(createRoyaltyPointDto);
+  @UseGuards(JwtAuthGuard)
+  @Get('my')
+  @ApiOperation({ summary: 'Get my royalty points history' })
+  @ApiResponse({ status: 200, description: 'Royalty history returned' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getMyRoyalties(@Req() req) {
+    return this.royaltyService.findMyRoyalties(req.user.userId);
   }
 
+  // ✅ Get my total royalty points
+  @UseGuards(JwtAuthGuard)
+  @Get('my/total')
+  @ApiOperation({ summary: 'Get my total royalty points' })
+  @ApiResponse({ status: 200, description: 'Total royalty points returned' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  getMyTotal(@Req() req) {
+    return this.royaltyService.getUserTotal(req.user.userId);
+  }
+
+  // ✅ Admin: get all royalty records
+  @UseGuards(JwtAuthGuard)
   @Get()
+  @ApiOperation({ summary: 'Get all royalty records (Admin)' })
+  @ApiResponse({ status: 200, description: 'All royalty records returned' })
   findAll() {
-    return this.royaltyPointService.findAll();
+    return this.royaltyService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.royaltyPointService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoyaltyPointDto: UpdateRoyaltyPointDto) {
-    return this.royaltyPointService.update(+id, updateRoyaltyPointDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.royaltyPointService.remove(+id);
+  // ✅ Admin: get total points for a specific user
+  @UseGuards(JwtAuthGuard)
+  @Get('user/:id/total')
+  @ApiOperation({ summary: 'Get total royalty points for a specific user' })
+  @ApiParam({ name: 'id', description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'User total points returned' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  getUserTotal(@Param('id') id: number) {
+    return this.royaltyService.getUserTotal(id);
   }
 }
