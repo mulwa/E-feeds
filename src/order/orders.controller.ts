@@ -7,6 +7,7 @@ import {
   Patch,
   Param,
   Get,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -19,6 +20,7 @@ import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
+import { PaginationQueryDto } from 'src/pagination/pagination.dto';
 
 @ApiTags('Orders')
 @ApiBearerAuth()
@@ -42,8 +44,10 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get orders for the logged-in user' })
   @ApiResponse({ status: 200, description: 'User orders retrieved' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getMyOrders(@Req() req) {
-    return this.ordersService.findMyOrders(req.user.userId);
+  getMyOrders(@Req() req,@Query() query: PaginationQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 100;
+    return this.ordersService.findMyOrders(req.user.userId,page,limit,query.sort);
   }
 
   // ✅ UPDATE ORDER STATUS (ADMIN / DASHBOARD USER)
@@ -65,8 +69,10 @@ export class OrdersController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
-  getAllOrders() {
-    return this.ordersService.findAllOrders();
+  getAllOrders(@Query() query: PaginationQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 100;
+    return this.ordersService.findAllOrders(page, limit, query.sort);
   }
 
 }

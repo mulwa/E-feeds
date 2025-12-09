@@ -13,6 +13,7 @@ import { Order } from './entities/order.entity';
 import { OrderStatus } from './enum/order-status';
 import { PaymentStatus } from './enum/payment-status';
 import { RoyaltyPoint } from 'src/royalty-point/entities/royalty-point.entity';
+import { PaginationService } from 'src/pagination/pagination_service';
 
 @Injectable()
 export class OrdersService {
@@ -85,9 +86,18 @@ export class OrdersService {
     return order;
   }
 
-  findMyOrders(userId: number) {
-    return this.orderRepo.find({
-      where: { user: { userId } },
+  findMyOrders(userId: number,page: number,
+    limit: number,
+    sort?: string,) {
+
+    // return this.orderRepo.find({
+    //   where: { user: { userId } },
+    //   relations: ['items', 'items.product'],
+    // });
+    return PaginationService.paginate(this.orderRepo, page, limit, {
+      search: userId.toString(),
+      searchFields: ['user'], // searchable fields
+      sort,
       relations: ['items', 'items.product'],
     });
   }
@@ -102,16 +112,26 @@ export class OrdersService {
 
     return this.orderRepo.save(order);
   }
-  async findAllOrders() {
-  return this.orderRepo.find({
-    relations: [
-      'user',
-      'items',
-      'items.product',
-      'royaltyPoints',
-    ],
-    order: { createdAt: 'DESC' },
-  });
+  async findAllOrders(page: number,
+    limit: number,sort?: string,) {
+  // return this.orderRepo.find({
+  //   relations: [
+  //     'user',
+  //     'items',
+  //     'items.product',
+  //     'royaltyPoints',
+  //   ],
+  //   order: { createdAt: 'DESC' },
+  // });
+    return PaginationService.paginate(this.orderRepo, page, limit, {
+      relations: [
+        'user',
+        'items',
+        'items.product',
+        'royaltyPoints',
+      ],
+      // order: { createdAt: 'DESC' },
+    });
 }
 
 }
