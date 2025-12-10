@@ -95,10 +95,10 @@ export class OrdersService {
     //   relations: ['items', 'items.product'],
     // });
     return PaginationService.paginate(this.orderRepo, page, limit, {
-      search: userId.toString(),
       searchFields: ['user'], // searchable fields
       sort,
       relations: ['items', 'items.product'],
+      where: { user: { userId } },
     });
   }
 

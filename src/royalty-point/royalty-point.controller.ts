@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Param } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Param, Query } from '@nestjs/common';
 import {
   ApiTags,
   ApiBearerAuth,
@@ -8,6 +8,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RoyaltyPointService } from './royalty-point.service';
+import { PaginationQueryDto } from 'src/pagination/pagination.dto';
 
 @ApiTags('Royalty Points')
 @ApiBearerAuth()
@@ -20,8 +21,10 @@ export class RoyaltyPointController {
   @ApiOperation({ summary: 'Get my royalty points history' })
   @ApiResponse({ status: 200, description: 'Royalty history returned' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  getMyRoyalties(@Req() req) {
-    return this.royaltyService.findMyRoyalties(req.user.userId);
+  getMyRoyalties(@Req() req,@Query() query: PaginationQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 100;
+    return this.royaltyService.findMyRoyalties(req.user.userId,page,limit);
   }
 
   // ✅ Get my total royalty points

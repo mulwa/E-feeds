@@ -63,7 +63,7 @@ export class OrdersController {
     return this.ordersService.updateStatus(id, dto);
   }
 
-  @ApiOperation({ summary: 'Admin: View all orders' })
+  @ApiOperation({ summary: 'Admin: View all orders (paginated)' })
   @ApiResponse({ status: 200, description: 'All orders returned' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiBearerAuth()
